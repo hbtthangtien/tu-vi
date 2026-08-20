@@ -1,23 +1,26 @@
 // 天干 Heavenly Stems
 export const STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+export const VI_STEMS = ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý'];
 
 // 地支 Earthly Branches
 export const BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+export const VI_BRANCHES = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
 
-// 时辰对应地支
+// 时辰对应地支 (13 mốc giờ sinh chuẩn iztro & Tử Vi Việt Nam)
 export const SHICHEN = [
-  { branch: 0, name: '子时', range: '23:00-01:00' },
-  { branch: 1, name: '丑时', range: '01:00-03:00' },
-  { branch: 2, name: '寅时', range: '03:00-05:00' },
-  { branch: 3, name: '卯时', range: '05:00-07:00' },
-  { branch: 4, name: '辰时', range: '07:00-09:00' },
-  { branch: 5, name: '巳时', range: '09:00-11:00' },
-  { branch: 6, name: '午时', range: '11:00-13:00' },
-  { branch: 7, name: '未时', range: '13:00-15:00' },
-  { branch: 8, name: '申时', range: '15:00-17:00' },
-  { branch: 9, name: '酉时', range: '17:00-19:00' },
-  { branch: 10, name: '戌时', range: '19:00-21:00' },
-  { branch: 11, name: '亥时', range: '21:00-23:00' },
+  { branch: 0, timeIndex: 0, name: 'Tý sớm (00:00 - 01:00)', zhName: '早子时', range: '00:00-01:00', description: 'Đầu ngày mới' },
+  { branch: 1, timeIndex: 1, name: 'Sửu (01:00 - 03:00)', zhName: '丑时', range: '01:00-03:00' },
+  { branch: 2, timeIndex: 2, name: 'Dần (03:00 - 05:00)', zhName: '寅时', range: '03:00-05:00' },
+  { branch: 3, timeIndex: 3, name: 'Mão (05:00 - 07:00)', zhName: '卯时', range: '05:00-07:00' },
+  { branch: 4, timeIndex: 4, name: 'Thìn (07:00 - 09:00)', zhName: '辰时', range: '07:00-09:00' },
+  { branch: 5, timeIndex: 5, name: 'Tỵ (09:00 - 11:00)', zhName: '巳时', range: '09:00-11:00' },
+  { branch: 6, timeIndex: 6, name: 'Ngọ (11:00 - 13:00)', zhName: '午时', range: '11:00-13:00' },
+  { branch: 7, timeIndex: 7, name: 'Mùi (13:00 - 15:00)', zhName: '未时', range: '13:00-15:00' },
+  { branch: 8, timeIndex: 8, name: 'Thân (15:00 - 17:00)', zhName: '申时', range: '15:00-17:00' },
+  { branch: 9, timeIndex: 9, name: 'Dậu (17:00 - 19:00)', zhName: '酉时', range: '17:00-19:00' },
+  { branch: 10, timeIndex: 10, name: 'Tuất (19:00 - 21:00)', zhName: '戌时', range: '19:00-21:00' },
+  { branch: 11, timeIndex: 11, name: 'Hợi (21:00 - 23:00)', zhName: '亥时', range: '21:00-23:00' },
+  { branch: 0, timeIndex: 12, name: 'Dạ Tý / Tý muộn (23:00 - 24:00)', zhName: '晚子时', range: '23:00-24:00', description: 'Cuối ngày cũ' },
 ];
 
 // 十二宫名，从命宫顺时针

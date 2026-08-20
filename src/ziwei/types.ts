@@ -1,22 +1,39 @@
+export type CalendarType = 'solar' | 'lunar';
+
+export interface SolarInfo {
+  solarYear: number;
+  solarMonth: number;
+  solarDay: number;
+}
+
 export interface BirthInfo {
-  year: number;      // Gregorian year
-  month: number;     // Gregorian month (1-12)
-  day: number;       // Gregorian day
-  hour: number;      // 时辰 branch index (0=子, 1=丑, ... 11=亥)
+  year: number;      // Năm sinh (Dương lịch hoặc Âm lịch tuỳ calendarType)
+  month: number;     // Tháng sinh (1-12)
+  day: number;       // Ngày sinh (1-31)
+  hour: number;      // 时辰/Giờ sinh (0=Tý sớm, 1=Sửu, ..., 11=Hợi, 12=Dạ Tý)
   gender: 'male' | 'female';
+  calendarType?: CalendarType;  // 'solar' (Dương lịch - mặc định) | 'lunar' (Âm lịch)
+  isLeapMonth?: boolean;        // Khi calendarType === 'lunar', đánh dấu tháng nhuận
+  isPre1975SouthVN?: boolean;   // Sinh tại Miền Nam (1960-1975) dùng GMT+8 (hiệu chỉnh -1h)
+  minute?: number;              // Phút sinh cụ thể (0-59, tuỳ chọn)
   name?: string;
-  province?: string;   // 出生省份
-  city?: string;       // 出生城市
-  longitude?: number;  // 出生地经度（用于真太阳时校正）
+  province?: string;   // Tỉnh/Thành phố sinh (dùng tính chân thái dương thời)
+  city?: string;
+  longitude?: number;  // Kinh độ (dùng tính chân thái dương thời)
 }
 
 export interface LunarInfo {
   lunarYear: number;
   lunarMonth: number;    // positive = normal, negative = leap month
   lunarDay: number;
-  yearStem: number;      // 0-9 (甲乙丙丁戊己庚辛壬癸)
-  yearBranch: number;    // 0-11 (子丑寅卯辰巳午未申酉戌亥)
+  yearStem: number;      // 0-9 (甲乙丙丁戊己庚辛壬癸 / Giáp..Quý)
+  yearBranch: number;    // 0-11 (子丑寅卯辰巳午未申酉戌亥 / Tý..Hợi)
+  yearCanChi: string;    // e.g. 'Giáp Thìn' / '甲辰'
+  monthCanChi?: string;  // e.g. 'Bính Dần'
+  dayCanChi?: string;    // e.g. 'Ất Tỵ'
+  hourCanChi?: string;   // e.g. 'Bính Tý'
   isLeapMonth: boolean;
+  solarInfo?: SolarInfo; // Ngày Dương lịch tương ứng (nếu nhập Âm lịch) hoặc gốc
 }
 
 export type SiHua = '禄' | '权' | '科' | '忌';

@@ -6,11 +6,22 @@
  * Ni Hai Xia knowledge base, and classical text data.
  */
 
-// ── Zi Wei algorithm ──────────────────────────────────────
+// ── Zi Wei algorithm & Vietnamese Lunar Calendar ─────────
 export {
   generateChart,
   getLunarInfo,
 } from './ziwei/algorithm';
+
+export {
+  convertSolar2Lunar,
+  convertLunar2Solar,
+  getYearCanChi,
+  getMonthCanChi,
+  getDayCanChi,
+  getHourCanChi,
+  jdFromDate,
+  jdToDate,
+} from './ziwei/vn-lunar';
 
 export {
   getSiHuaByStem,
@@ -31,7 +42,9 @@ export { detectPatterns, getMingGongSummary } from './ziwei/patterns';
 
 export {
   STEMS,
+  VI_STEMS,
   BRANCHES,
+  VI_BRANCHES,
   SHICHEN,
   PALACE_NAMES_ORDER,
   SI_HUA_TABLE,
@@ -48,6 +61,8 @@ export {
 // ── Types ──────────────────────────────────────────────────
 export type {
   BirthInfo,
+  CalendarType,
+  SolarInfo,
   LunarInfo,
   SiHua,
   Star,

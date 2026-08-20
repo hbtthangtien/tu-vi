@@ -1,29 +1,81 @@
 /**
- * 紫微斗数排盘算法 — 基于 iztro 开源库
- * https://github.com/SylarLong/iztro
+ * 紫微斗数排盘算法 — 基于 iztro 开源库 & Lịch Âm Việt Nam (UTC+7)
+ * Hỗ trợ chuyển đổi Lịch Âm / Dương chuẩn Việt Nam và 13 mốc giờ sinh.
  */
 
 import { astro } from 'iztro';
-import { Solar } from 'lunar-javascript';
-import type { BirthInfo, LunarInfo, Star, Palace, DaXian, DaXianSiHua, ZiweiChart } from './types';
+import {
+  convertSolar2Lunar,
+  convertLunar2Solar,
+  getYearCanChi,
+  getMonthCanChi,
+  getDayCanChi,
+  getHourCanChi,
+} from './vn-lunar';
+import type { BirthInfo, LunarInfo, Star, Palace, DaXian, ZiweiChart, CalendarType } from './types';
 import { BRANCHES, STEMS } from './constants';
-// 飞星派工具仅供导出，不再在排盘时调用（倪师《天纪 03》：四化星永远固定不动）
-// import { detectSelfSihua, getSiHuaByStem } from './sihua';
 
-// ─── 农历信息（兼容保留）────────────────────────────────────────
-export function getLunarInfo(year: number, month: number, day: number): LunarInfo {
-  const solar = Solar.fromYmd(year, month, day);
-  const lunar = solar.getLunar();
-  const yearStem = STEMS.indexOf(lunar.getYearGan());
-  const yearBranch = BRANCHES.indexOf(lunar.getYearZhi());
-  const rawMonth = lunar.getMonth();
+// ─── 农历信息（Chuyển đổi Lịch Âm - Dương chuẩn Việt Nam UTC+7）────────────────
+export function getLunarInfo(
+  year: number,
+  month: number,
+  day: number,
+  calendarType: CalendarType = 'solar',
+  isLeapMonth: boolean = false,
+  hour: number = 0,
+): LunarInfo {
+  let lunarDay: number;
+  let lunarMonth: number;
+  let lunarYear: number;
+  let isLeap: boolean;
+  let solarDay: number;
+  let solarMonth: number;
+  let solarYear: number;
+  let jd: number;
+
+  if (calendarType === 'lunar') {
+    lunarDay = day;
+    lunarMonth = month;
+    lunarYear = year;
+    isLeap = !!isLeapMonth;
+    const solarRes = convertLunar2Solar(lunarDay, lunarMonth, lunarYear, isLeap);
+    solarDay = solarRes.day;
+    solarMonth = solarRes.month;
+    solarYear = solarRes.year;
+    jd = solarRes.jd;
+  } else {
+    solarDay = day;
+    solarMonth = month;
+    solarYear = year;
+    const lunarRes = convertSolar2Lunar(solarDay, solarMonth, solarYear);
+    lunarDay = lunarRes.day;
+    lunarMonth = lunarRes.month;
+    lunarYear = lunarRes.year;
+    isLeap = lunarRes.isLeap;
+    jd = lunarRes.jd;
+  }
+
+  const yearRes = getYearCanChi(lunarYear);
+  const monthCanChi = getMonthCanChi(lunarMonth, yearRes.stemIndex);
+  const dayRes = getDayCanChi(jd);
+  const hourCanChi = getHourCanChi(dayRes.stemIndex, hour);
+
   return {
-    lunarYear: lunar.getYear(),
-    lunarMonth: Math.abs(rawMonth),
-    lunarDay: lunar.getDay(),
-    yearStem: yearStem >= 0 ? yearStem : 0,
-    yearBranch: yearBranch >= 0 ? yearBranch : 0,
-    isLeapMonth: rawMonth < 0,
+    lunarYear,
+    lunarMonth,
+    lunarDay,
+    yearStem: yearRes.stemIndex,
+    yearBranch: yearRes.branchIndex,
+    yearCanChi: yearRes.canChi,
+    monthCanChi,
+    dayCanChi: dayRes.canChi,
+    hourCanChi,
+    isLeapMonth: isLeap,
+    solarInfo: {
+      solarYear,
+      solarMonth,
+      solarDay,
+    },
   };
 }
 
@@ -64,14 +116,25 @@ function parseWuxingJu(name: string): number {
 
 // ─── 主函数：生成命盘 ────────────────────────────────────────────
 export function generateChart(birthInfo: BirthInfo): ZiweiChart {
-  const { year, month, day, hour, gender } = birthInfo;
+  let { year, month, day, hour, gender, calendarType, isLeapMonth, isPre1975SouthVN } = birthInfo;
+  calendarType = calendarType ?? 'solar';
+  isLeapMonth = isLeapMonth ?? false;
 
-  // 调用 iztro 排盘
-  const solarDate = `${year}-${month}-${day}`;
+  // Hiệu chỉnh giờ sinh nếu sinh tại Miền Nam giai đoạn 1960-1975 (GMT+8 -> GMT+7: lùi 1 giờ)
+  let adjustedHour = hour;
+  if (isPre1975SouthVN && year >= 1960 && year <= 1975) {
+    adjustedHour = adjustedHour === 0 ? 11 : adjustedHour === 12 ? 11 : adjustedHour - 1;
+  }
+
+  // 1. Tính thông tin Âm - Dương chuẩn Việt Nam
+  const lunarInfo = getLunarInfo(year, month, day, calendarType, isLeapMonth, adjustedHour);
+
+  // 2. An sao qua iztro byLunar (sử dụng ngày Âm lịch đã tính chuẩn thiên văn)
   const iztroGender = gender === 'male' ? '男' : '女';
-  const astrolabe = astro.bySolar(solarDate, hour, iztroGender, true, 'zh-CN');
+  const lunarDateStr = `${lunarInfo.lunarYear}-${lunarInfo.lunarMonth}-${lunarInfo.lunarDay}`;
+  const astrolabe = astro.byLunar(lunarDateStr, adjustedHour, iztroGender, lunarInfo.isLeapMonth, true, 'zh-CN');
 
-  // ── 组装十二宫 ──
+  // 3. 组装十二宫
   const palaces: Palace[] = astrolabe.palaces.map(p => {
     const branch = BRANCHES.indexOf(p.earthlyBranch as string);
     const stem   = STEMS.indexOf(p.heavenlyStem as string);
@@ -109,9 +172,9 @@ export function generateChart(birthInfo: BirthInfo): ZiweiChart {
     };
   });
 
-  // ── 当前年龄 & 大限 ──
+  // 4. Tuổi hiện tại & Đại hạn
   const currentYear = new Date().getFullYear();
-  const currentAge  = currentYear - year;
+  const currentAge  = currentYear - (lunarInfo.solarInfo?.solarYear ?? year);
 
   palaces.forEach(p => {
     if (p.daXianAge && currentAge >= p.daXianAge[0] && currentAge <= p.daXianAge[1]) {
@@ -119,7 +182,7 @@ export function generateChart(birthInfo: BirthInfo): ZiweiChart {
     }
   });
 
-  // ── 借对宫结构化字段（codex P0：避免文案层从自然语言反查借宫信息）──
+  // 5. Cung đối xung & Mượn sao
   palaces.forEach(p => {
     p.oppositeBranch = (p.branch + 6) % 12;
     const mainStars = p.stars.filter(s => s.type === 'major');
@@ -134,18 +197,17 @@ export function generateChart(birthInfo: BirthInfo): ZiweiChart {
     }
   });
 
-  // ── 关键宫支 ──
+  // 6. Cung Mệnh, Thân, Cục
   const mingGongBranch = BRANCHES.indexOf(astrolabe.earthlyBranchOfSoulPalace as string);
   const shenGongBranch = BRANCHES.indexOf(astrolabe.earthlyBranchOfBodyPalace as string);
   const wuxingJuName   = astrolabe.fiveElementsClass as string;
   const wuxingJu       = parseWuxingJu(wuxingJuName);
 
-  // ── 紫微星位置 ──
+  // 7. Vị trí Tử Vi
   const ziweiPalace = palaces.find(p => p.stars.some(s => s.name === '紫微' && s.type === 'major'));
   const ziweiPos    = ziweiPalace?.branch ?? 0;
 
-  // ── 大限数组（倪师《天纪》正统：四化永远固定，大限只看宫位移动）──
-  // 不再生成 daXians[].siHua / stemIndex / stemName（飞星派字段已下线）
+  // 8. Mảng Đại hạn
   const daXians: DaXian[] = palaces
     .filter(p => p.daXianAge)
     .sort((a, b) => a.daXianAge![0] - b.daXianAge![0])
@@ -156,17 +218,15 @@ export function generateChart(birthInfo: BirthInfo): ZiweiChart {
       palaceName:   p.name,
     }));
 
-  // 宫干自化已下线（倪师不主张飞星派宫干自化论）
-
   const currentDaXianIndex = daXians.findIndex(
     dx => currentAge >= dx.startAge && currentAge <= dx.endAge,
   );
 
-  // ── 农历信息 ──
-  const lunarInfo = getLunarInfo(year, month, day);
-
   return {
-    birthInfo,
+    birthInfo: {
+      ...birthInfo,
+      hour: adjustedHour,
+    },
     lunarInfo,
     mingGongBranch: mingGongBranch >= 0 ? mingGongBranch : 0,
     shenGongBranch: shenGongBranch >= 0 ? shenGongBranch : 0,

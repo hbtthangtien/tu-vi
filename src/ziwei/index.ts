@@ -12,3 +12,4 @@ export * from './types';
 export * from './cities';
 export * from './famous';
 export * from './heming-knowledge';
+export * from './vn-lunar';
