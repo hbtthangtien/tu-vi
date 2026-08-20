@@ -39,6 +39,12 @@ export {
 } from './ziwei/sihua';
 
 export { detectPatterns, getMingGongSummary } from './ziwei/patterns';
+export {
+  getTopicAnalysis,
+  TOPIC_PALACE_NAME,
+  TOPIC_LABEL,
+} from './ziwei/db-analysis';
+export type { TopicKey } from './ziwei/db-analysis';
 
 export {
   STEMS,

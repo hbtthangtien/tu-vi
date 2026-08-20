@@ -13,3 +13,4 @@ export * from './cities';
 export * from './famous';
 export * from './heming-knowledge';
 export * from './vn-lunar';
+export * from './db-analysis';
