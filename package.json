@@ -1,45 +1,49 @@
 {
-  "name": "ziwei-master",
-  "version": "0.1.0",
+  "name": "@tu-vi/core",
+  "version": "1.0.0",
+  "description": "Zi Wei Dou Shu (紫微斗数) core algorithm library — chart generation, Si Hua, pattern detection, classical texts",
   "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./ziwei": {
+      "types": "./dist/ziwei/index.d.ts",
+      "import": "./dist/ziwei/index.mjs",
+      "require": "./dist/ziwei/index.js"
+    },
+    "./nihai": {
+      "types": "./dist/nihai/index.d.ts",
+      "import": "./dist/nihai/index.mjs",
+      "require": "./dist/nihai/index.js"
+    },
+    "./classics": {
+      "types": "./dist/classics/index.d.ts",
+      "import": "./dist/classics/index.mjs",
+      "require": "./dist/classics/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "build:cf": "npx @cloudflare/next-on-pages",
-    "preview:cf": "npx wrangler pages dev",
-    "prepare": "husky"
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.27.0",
-    "@types/pg": "^8.20.0",
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0",
-    "clsx": "^2.1.1",
-    "framer-motion": "^11.3.0",
-    "html2canvas": "^1.4.1",
-    "ioredis": "^5.10.1",
     "iztro": "^2.5.8",
-    "lunar-javascript": "^1.7.3",
-    "next": "^15.5.15",
-    "pg": "^8.20.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "vercel": "^50.42.0"
+    "lunar-javascript": "^1.7.3"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.16",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "autoprefixer": "^10.0.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.0",
-    "typescript": "^5"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,md,mdx}": "node scripts/zh-punct-lint.mjs --fix"
+    "rimraf": "^6.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.6.0"
   }
 }

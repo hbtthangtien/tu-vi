@@ -1,8 +1,13 @@
+# Dependencies
 node_modules/
-.next/
-.vercel/
-.env*
-!.env.example
+
+# Build outputs
 dist/
-*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS Files
 .DS_Store
+Thumbs.db
